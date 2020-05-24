@@ -204,3 +204,5 @@ sitemap_exclude:  # Sitemap will exclude the following items.
     - sitemap.xml
     - robots.txt
     - redirects.json
+
+staticman_url: https://dev.staticman.net/v3/entry/github/PyBagheri/b32.ir/master

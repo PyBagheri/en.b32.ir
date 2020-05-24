@@ -1,3 +1,0 @@
-1. Made a change in _includes/sidebar.html
-2. Made a change in assets/css/_addon/fonts.scss 
-
