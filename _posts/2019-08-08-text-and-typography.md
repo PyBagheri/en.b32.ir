@@ -1,5 +1,6 @@
 ---
 title: Text and Typography
+lang: fa
 author: Cotes Chung
 date: 2019-08-08 11:33:00 +0800
 categories: [Blogging, Demo]
@@ -54,8 +55,16 @@ Fluttering and dancing in the breeze.
 
 ## Footnote
 
-Click the hook will locate the footnote[^footnote].
+**Click the hook will locate the footnote[^footnote].**
 
+سلامی به بلندای غروب بزرگ شرقی ای کلم[^footnote2].
+
+ <audio controls>
+  <source src="horse.ogg" type="audio/ogg">
+  <source src="horse.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio> 
+{: .center-transform}
 
 ## Image
 
@@ -156,3 +165,4 @@ fi;
 ## Reverse Footnote
 
 [^footnote]: The footnote source.
+[^footnote2]: The footnote source.

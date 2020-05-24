@@ -1,5 +1,7 @@
 ---
 title: Getting Started
+lang: fa
+image: http://127.0.0.1:4000/assets/img/posts/sample1.jpg
 author: Cotes Chung
 date: 2019-08-09 20:55:00 +0800
 categories: [Blogging, Tutorial]
@@ -17,6 +19,7 @@ To improve the writing experience, we need to use some script tools. If your mac
 ```console
 $ sudo apt-get install coreutils
 ```
+{: .persian }
 
 * macOS
 
@@ -78,9 +81,9 @@ As mentioned above, some files or directories should be removed from your repo:
 
 - .travis.yml
 - .github
+{: .english }
 
-
-## Configuration
+## تنظیمات لازم
 
 Generally, go to `_config.yml` and configure the variables as needed. Some of them are typical options:
 
@@ -105,7 +108,7 @@ Generally, go to `_config.yml` and configure the variables as needed. Some of th
 
     - **dark**  - Always show dark mode.
     - **light** - Always show light mode.
-
+{: .english }
 
 ##  Run Locally
 
@@ -129,6 +132,7 @@ Before the deployment begins, checkout the file `_config.yml` and make sure that
 By deploying the site in this way, you're allowed to push the source code directly to the remote.
 
 > **Note**: If you want to use any third-party Jekyll plugins that not in [this list](https://pages.github.com/versions/), stop reading the current approach and go to [*Option 2: Build locally*](#option-2-build-locally).
+{: .english}
 
 **1**. Rename the repository to:
 
@@ -136,6 +140,7 @@ By deploying the site in this way, you're allowed to push the source code direct
 |:---|:---|
 |User or Organization | `<username>.github.io`|
 |Project| Any one except `<username>.github.io`, let's say `project`|
+{: .persian.table-fw.table-ct }
 
 **2**. Commit the changes of the repo first, then run the initialization script:
 
@@ -201,3 +206,5 @@ The generated static files will be placed in the root of `/path/to/local/project
 ### Finishing work
 
 No matter which way you choose to deploy the website on GitHub, please enforce the `HTTPS` for it. See official docs: [Configuring a publishing source for your GitHub Pages site](https://help.github.com/en/github/working-with-github-pages/securing-your-github-pages-site-with-https).
+
+#### OoooooooOOOOOOOOOOOOOOOOOOOOOOOOOOOOO

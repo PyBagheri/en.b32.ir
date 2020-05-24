@@ -13,10 +13,11 @@ layout: default
 
     <div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4">
 
-      <h1 data-toc-skip>{{ page.title }}</h1>
+      <h1 data-toc-skip {% if page.lang == 'fa' %}style="direction: rtl; text-align: right;"{% endif %}>{{ page.title }}</h1>
 
-      <div class="post-meta text-muted d-flex flex-column">
+      <div class="post-meta text-muted d-flex flex-column" {% if page.lang == 'fa' %}style="justify-content: flex-start; flex-direction: row-reverse !important;"{% endif %}>
         <!-- Published date and author -->
+	{% if page.lang != 'fa' %}
         <div>
           Posted
           <span class="timeago" data-toggle="tooltip" data-placement="bottom"
@@ -25,14 +26,32 @@ layout: default
             <i class="unloaded">{{ page.date | date_to_xmlschema }}</i>
           </span>
           by
-          <span class="author">
+          <a href="/tabs/about" class="author">
           {% if page.author %}
             {{ page.author }}
           {% else%}
             {{ site.author }}
           {% endif %}
-          </span>
+          </a>
         </div>
+	{% else %}
+        <div style="direction: rtl; text-align: right;">
+          نوشته شده در
+          <span class="timeago farsi" data-toggle="tooltip" data-placement="bottom"
+           title="{{ page.date | date: site.data.date_format.tooltip }}">
+            {{ page.date | date: site.data.date_format.post }}
+            <i class="unloaded">{{ page.date | date_to_xmlschema }}</i>
+          </span>،
+          توسط
+          <a href="/tabs/about" class="author">
+          {% if page.author %}
+            {{ page.author }}
+          {% else%}
+            {{ site.author }}
+          {% endif %}
+          </a>
+        </div>
+	{% endif %}
 
         <!-- lastmod -->
         {%- capture filename -%}
@@ -42,6 +61,7 @@ layout: default
         {% assign record = site.data.updates | where: "filename", filename | first %}
 
         {% if record %}
+	{% if page.lang != 'fa' %}
         <div>
           Updated
           <span class="timeago lastmod"
@@ -51,6 +71,17 @@ layout: default
             <i class="unloaded">{{ record.lastmod | date_to_xmlschema}}</i>
           </span>
         </div>
+        {% else %}
+        <div class="farsi" style="direction: rtl; text-align: right;">
+          به‌روز شده در
+          <span class="timeago lastmod farsi"
+            data-toggle="tooltip" data-placement="bottom"
+             title="{{ record.lastmod | date: site.data.date_format.tooltip }}">
+            {{ record.lastmod | date: site.data.date_format.post }}
+            <i class="unloaded">{{ record.lastmod | date_to_xmlschema}}</i>
+          </span>
+        </div>
+        {% endif %}
         {% endif %}
 
         <!-- page views -->
@@ -63,14 +94,23 @@ layout: default
 
       </div> <!-- .post-meta -->
 
-      <div class="post-content">
+      <div class="post-content{% if page.lang == 'fa' %} farsi{% endif %}">
 
         {% if page.image %}
           <img src="{{ page.image }}">
         {% endif %}
 
         {{ content }}
-
+	
+	<div id="hyvor-talk-view"></div>
+        <script type="text/javascript">
+            var HYVOR_TALK_WEBSITE = 698;
+            var HYVOR_TALK_CONFIG = {
+                url: '{{ page.url | absolute_url }}',
+                id: '{{page.id}}'
+            };
+        </script>
+        <script async type="text/javascript" src="//talk.hyvor.com/web-api/embed"></script>
       </div>
 
       <div class="post-tail-wrapper text-muted">

@@ -51,13 +51,13 @@
       {% assign post = site.posts[index] %}
       <div class="card">
         <a href="{{ post.url | relative_url }}">
-          <div class="card-body">
-            <span class="timeago small">
+          <div class="card-body{% if post.lang == 'fa' %} rtl align-right{% endif %}">
+            <span class="timeago{% if post.lang == 'fa' %} farsi rtl align-right{% endif %} small">
                 {{ post.date | date: site.data.date_format.post }}
                 <i class="unloaded">{{ post.date | date_to_xmlschema }}</i>
             </span>
-            <h3 class="pt-0 mt-1 mb-3" data-toc-skip>{{ post.title }}</h3>
-            <div class="text-muted small">
+            <h3 class="pt-0 mt-1 mb-3{% if post.lang == 'fa' %} rtl align-right{% endif %}" data-toc-skip>{{ post.title }}</h3>
+            <div class="text-muted small{% if post.lang == 'fa' %} rtl align-right{% endif %}">
               {% assign content = post.content %}
               {% include no-linenos.html %}
               <p>{{ content | markdownify | strip_html | truncate: 200 | replace: '&', '&amp;' }}</p>
