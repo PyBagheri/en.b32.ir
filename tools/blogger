@@ -1,0 +1,416 @@
+#!/usr/bin/env python3
+# A simple script for managing weblog posts.
+# © 2020 MohammadHossein Bagheri KheirAbadi
+# MIT License
+
+import sys
+import os
+import datetime
+import pytz
+import shutil
+import re
+
+# Install with: pip install jdatetime
+import jdatetime
+
+
+def enToFaNumbers(string):
+    return str(string).replace('0', '۰') \
+                      .replace('1', '۱') \
+                      .replace('2', '۲') \
+                      .replace('3', '۳') \
+                      .replace('4', '۴') \
+                      .replace('5', '۵') \
+                      .replace('6', '۶') \
+                      .replace('7', '۷') \
+                      .replace('8', '۸') \
+                      .replace('9', '۹')
+
+
+def getJalaliMonthName(month_number):
+    return ['فروردین',
+            'اردیبهشت',
+            'خرداد',
+            'تیر',
+            'مرداد',
+            'شهریور',
+            'مهر',
+            'آبان',
+            'آذر',
+            'دی',
+            'بهمن',
+            'اسفند'][month_number - 1]
+
+
+def getIranianWeekdayName(iso_weekday_number):
+    return ['دوشنبه',
+            'سه‌شنبه',
+            'چهارشنبه',
+            'پنجشنبه',
+            'جمعه',
+            'شنبه',
+            'یکشنبه'][iso_weekday_number - 1]
+
+
+class BColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+# Constant variables
+base_dir = os.path.abspath(os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), os.pardir))
+website_url = 'https://b32.ir/en/'
+
+
+def update_post(filename, title='', filename_update=False):
+    with open(os.path.join(base_dir, '_posts/{0}'.format(filename)), 'a+') as post:
+        post.seek(0)
+        full_content = post.read()
+        post_content = re.findall(r"^---[\s\S]+?---", full_content)[0]
+
+        post_datetime = datetime.datetime.now(pytz.timezone('Asia/Tehran'))
+
+        if filename_update:
+            try:
+                post_file_datetime = datetime.datetime.strptime(re.findall(
+                    "\ndate: (.*?)??\n", post_content)[0], '%Y-%m-%d %H:%M:%S %z')
+
+                if input(BColors.BOLD + 'Do you want to refresh the date TO NOW? (Yes/No) ' + BColors.ENDC).strip().lower() != 'yes':
+                    post_datetime = post_file_datetime
+            except (ValueError, IndexError):
+                if input(BColors.BOLD + BColors.WARNING + 'The post does not have a VALID datetime, do you want to use the current datetime? (Y/n) ' + BColors.ENDC).strip().lower() != 'y':
+                    print(BColors.BOLD + BColors.FAIL +
+                          '\nCancelled, please ensure that the "date" field in the post file mathes the format "%Y-%m-%d %H:%M:%S %z"' + BColors.ENDC)
+                    exit()
+
+        print()
+
+        jalali_datetime = jdatetime.GregorianToJalali(
+            post_datetime.year, post_datetime.month, post_datetime.day)
+
+        if filename_update:
+            title = re.findall("title: (.*?)??\n", post_content)[0]
+
+        to_replace = {"(date: )(.*?)??\n": post_datetime.strftime('%Y-%m-%d %H:%M:%S %z'),
+                      "(    fa: )(.*?)??\n": enToFaNumbers(jalali_datetime.jyear),
+                      "(    en: )(.*?)??\n": str(jalali_datetime.jyear),
+                      "(    number: )(.*?)??\n": str(jalali_datetime.jmonth),
+                      "(    name: )(.*?)??\n": getJalaliMonthName(jalali_datetime.jmonth),
+                      "(  day: )(.*?)??\n": str(jalali_datetime.jday),
+                      "(  weekdayname: )(.*?)??\n": getIranianWeekdayName(post_datetime.isoweekday()),
+                      "(  time: )(.*?)??\n": post_datetime.strftime('%H:%M:%S %z')}
+
+        # Check if jdate fields exist
+        if not re.findall("\njdate:.*?\n", post_content):
+            post_content = re.sub("date: (.*?)??\n", 'date: ' + r'\g<1>' +
+                                  "\njdate:\n" +
+                                  "  year:\n" +
+                                  "    fa: {jdate_year_fa}\n" +
+                                  "    en: {jdate_year_en}\n" +
+                                  "  month:\n" +
+                                  "    number: {jdate_month_number}\n" +
+                                  "    name: {jdate_month_name}\n" +
+                                  "  day: {jdate_day}\n" +
+                                  "  weekdayname: {jdate_weekdayname}\n" +
+                                  "  time: {jdate_time}\n", post_content, 1)
+
+        for regex, value in to_replace.items():
+            post_content = re.sub(
+                regex, r'\g<1>' + value + '\n', post_content, 1)
+
+        post.truncate(0)
+        post.write(re.sub(r"^---[\s\S]+?---", post_content, full_content, 1))
+
+    os.rename(os.path.join(base_dir, '_posts/' + filename), os.path.join(base_dir,
+                                                                         '_posts/' + post_datetime.strftime('%Y-%m-%d') + filename[10:]))
+    print(BColors.BOLD + BColors.OKBLUE + 'The post updated successfully!\n\nYour post:\nTitle: {0}\nFilename: {1}\nDate & Time: {2}'.format(
+        title, filename, post_datetime.strftime('%Y-%m-%d %H:%M:%S %z')) + BColors.ENDC)
+
+
+if sys.argv[1].lower() == 'new':
+    # Title & Filename'.blogger.data'
+    title = input(BColors.BOLD + "Title of your new post: " +
+                  BColors.ENDC).strip()
+    raw_filename = input(
+        BColors.BOLD + "English/Persian filename of the new post: " + BColors.ENDC).strip()
+
+    # Datetime in Iran
+    now = datetime.datetime.now(pytz.timezone('Asia/Tehran'))
+
+    # String for date, used at the first of the post filename.
+    date_now_string = now.strftime('%Y-%m-%d')
+
+    # Convert whitespaces to a single dash
+    filename = '-'.join(raw_filename.split())
+
+    # Full filename with date, title and ".md" extension.
+    full_filename = '{0}.md'.format(date_now_string + '-' + filename)
+
+    # Path of the markdown file of the new post
+    post_file_path = os.path.join(base_dir, '_posts/{0}'.format(full_filename))
+
+    # Using while loop to use "break" statement and prevent further checks after the first error.
+    while True:
+        no_error = True
+
+        while True:
+            # Check if there are slashes in filename.
+            if '/' in full_filename:
+                print(
+                    BColors.FAIL + 'Sorry, filenames cannot contain slashes (/)' + BColors.ENDC)
+                no_error = False
+                break
+
+            # Check if file exists.
+            if os.path.isfile(post_file_path):
+                # Show an error.
+                print(
+                    BColors.FAIL + 'Sorry, there is a file with that name in your posts directory: ' + full_filename)
+                print(
+                    'Please use another filename and ensure you are not repeating something.\n' + BColors.ENDC)
+
+                # Indicates that an error has occured.
+                no_error = False
+                break
+
+            # Checking if filename is valid
+            try:
+                with open(post_file_path, 'a'):
+                    pass
+                os.remove(post_file_path)
+            except Exception:
+                print(BColors.FAIL + 'The filename is invalid.\n' + BColors.ENDC)
+                no_error = False
+
+            break
+
+        if no_error:
+            break
+
+        # Take the input again
+        raw_filename = input(
+            BColors.BOLD + "English/Persian filename of the new post: " + BColors.ENDC).strip()
+
+        # Again
+        filename = '-'.join(raw_filename.split())
+        full_filename = '{0}.md'.format(date_now_string + '-' + filename)
+        post_file_path = os.path.join(
+            base_dir, '_posts/{0}'.format(full_filename))
+
+    # Post image
+    has_image = False
+    if input(BColors.BOLD + "\nDo you want to add attach an image as the main image of your post? (Y/n) " + BColors.ENDC).strip().lower() == 'y':
+        has_image = True
+        path = input(
+            BColors.BOLD + "Enter your image full path (or leave here empty to do it manually): " + BColors.ENDC).strip()
+        if path:
+            image_filename = path.split('/')[-1]
+            shutil.copyfile(path, os.path.join(
+                base_dir, 'assets/img/posts/' + image_filename))
+        else:
+            image_filename = input(
+                BColors.BOLD + "Copy your image to assets/img/posts/ directory at project root and give me its filename: " + BColors.ENDC).strip()
+
+            # Check if the image file exists, if not, take input until it does.
+            while not os.path.isfile(os.path.join(base_dir, 'assets/img/posts/' + image_filename)):
+                print(BColors.BOLD + "\nFile does not exist!\n" + BColors.ENDC)
+                image_filename = input(
+                    BColors.BOLD + "Copy your image to assets/img/posts/ directory at project root and give me its filename: " + BColors.ENDC).strip()
+
+    # Categories
+    main_cat = input(BColors.BOLD +
+                     "\nWhat is the main category of this post? " + BColors.ENDC).strip()
+
+    while not main_cat:
+        print(BColors.FAIL + 'The main category cannot be empty.' + BColors.ENDC)
+        main_cat = input(BColors.BOLD +
+                         "\nWhat is the main category of this post? " + BColors.ENDC).strip()
+
+    sub_cat = input(
+        BColors.BOLD + "What is the sub-category of this post? (Recommended but you can leave empty): " + BColors.ENDC).strip()
+
+    print()
+
+    tags = []
+    while True:
+        tag = input(BColors.BOLD +
+                    "Enter a tag (if done, press ENTER): " + BColors.ENDC).strip()
+        if tag:
+            tags.append(tag)
+        else:
+            break
+
+    new_tags = []
+    for tag in tags:
+        if tag not in new_tags:
+            new_tags.append(tag)
+
+    tags = new_tags
+
+    # Create the file and write in it.
+    with open(post_file_path, 'w') as file:
+        # Both "date" and "jdate" options will update after writing the post and running ./blogger update [filename]
+        header = ["---",
+                  "title: " + title,
+                  "lang: en",
+                  "author: محمدحسین باقری",
+                  "date: {gdate}",
+                  "jdate:",
+                  "  year:",
+                  "    fa: {jdate_year_fa}",
+                  "    en: {jdate_year_en}",
+                  "  month:",
+                  "    number: {jdate_month_number}",
+                  "    name: {jdate_month_name}",
+                  "  day: {jdate_day}",
+                  "  weekdayname: {jdate_weekdayname}",
+                  "  time: {jdate_time}",
+                  "categories: [{0}]".format(
+                      main_cat + (', {0}'.format(sub_cat) if sub_cat else '')),
+                  "tags: [{0}]".format(', '.join(tags)),
+                  "---"]
+
+        if has_image:
+            # Insert image option
+            header.insert(
+                3, "image: {0}/assets/img/posts/{1}".format(website_url, image_filename))
+
+        file.write('\n'.join(header))
+
+    # Where the script stores the files that are not updated yet.
+    with open(os.path.join(base_dir, 'tools/.blogger.data'), 'a+') as data:
+        try:
+            data.seek(0)  # Seek to the first of the file.
+            last_number = int(data.readlines()[-1].split('.')[0])
+        except (ValueError, IndexError):
+            last_number = 0
+
+        data.seek(0, 2)  # Seek to the last of the file.
+        data.writelines(
+            '{0}. {1}/{2}\n'.format(last_number + 1, full_filename, title))
+
+    print((BColors.OKBLUE + BColors.BOLD +
+           "\nCongratulations! Your post file created as _posts/{0}.\nAfter you have finished writing the post, run this command: ./blogger update" + BColors.ENDC).format(full_filename))
+
+elif sys.argv[1].lower() == 'update':
+    if sys.argv[2]:
+        if sys.argv[2].strip().lower() == '-f':
+            if not os.path.isfile(os.path.join(base_dir, '_posts/' + sys.argv[3])):
+                print(BColors.FAIL + BColors.BOLD +
+                      'No such filename in _posts/ directory!' + BColors.ENDC)
+                exit()
+
+            update_post(sys.argv[3], '', True)
+            exit()
+        elif sys.argv[2].strip().lower() == '-i':
+            posts_list = os.listdir(os.path.join(base_dir, '_posts/'))
+            lines = []
+            for index, post_filename in enumerate(posts_list):
+                with open(os.path.join(base_dir, '_posts/' + post_filename)) as post_file:
+                    title = re.findall("title: (.*?)??\n", post_file.read())[0]
+
+                # index, title, filename
+                lines.append([index + 1, title, post_filename])
+
+            while True:
+                while True:
+                    try:
+                        number_of_post = int(input(BColors.BOLD + 'List of your posts:\n\n{0}\n'.format('\n'.join(['{0}. {1} ==> {2}'.format(
+                            *item) for item in lines])) + '\nEnter the number of the post you want to update: ' + BColors.ENDC).strip())
+                        print()
+                        post_line = lines[number_of_post - 1]
+                        break
+                    except IndexError:
+                        print(BColors.FAIL + BColors.BOLD +
+                              'Invalid number!\n' + BColors.ENDC)
+
+                filename, title = post_line[2], post_line[1]
+
+                update_post(filename, title, filename_update=True)
+                del lines[post_line[0] - 1]
+
+                for index, ll in enumerate(lines):
+                    ll[0] = index + 1
+                    lines[index] = ll
+
+                if len(lines) > 0 and input(BColors.BOLD + '\nDo you want to update another post? (Y/n) ' + BColors.ENDC).strip().lower() == 'y':
+                    print()
+                    continue
+                else:
+                    break
+    else:
+        data_content = ''
+        with open(os.path.join(base_dir, 'tools/.blogger.data'), 'a+') as data:
+            data.seek(0)
+            data_content = data.readlines()
+            if len(data_content) == 0:
+                print(BColors.WARNING + BColors.BOLD +
+                      'There are no posts for updating.' + BColors.ENDC)
+            elif len(data_content) == 1:
+                raw_line = data_content[0]
+                line = raw_line[raw_line.find('.') + 2:].strip()
+                filename, title = line[:line.find(
+                    '/')], line[line.find('/') + 1:]
+                if input(BColors.BOLD + 'Here is your only single post that is not updated:\n\n1. {0} ==> {1}\n\nDo you want to update it? (Y/n) '.format(title, filename) + BColors.ENDC).strip().lower() == 'y':
+                    print()
+                    update_post(filename, title)
+                    data.truncate(0)
+            else:
+                raw_lines = data_content
+                lines = []
+                for index, raw_line in enumerate(raw_lines):
+                    line = raw_line[raw_line.find('.') + 2:].strip()
+
+                    # index, title, filename
+                    lines.append(
+                        [index + 1, line[line.find('/') + 1:], line[:line.find('/')]])
+
+                while True:
+                    while True:
+                        try:
+                            number_of_post = int(input(BColors.BOLD + 'Here are your posts that are not updated:\n\n{0}\n'.format('\n'.join(['{0}. {1} ==> {2}'.format(
+                                *item) for item in lines])) + '\nEnter the number of the post you want to update (press ENTER to update the last one): ' + BColors.ENDC).strip())
+                            print()
+                            post_line = lines[number_of_post - 1]
+                            break
+                        except IndexError:
+                            print(BColors.FAIL + BColors.BOLD +
+                                  'Invalid number!\n' + BColors.ENDC)
+
+                    filename, title = post_line[2], post_line[1]
+
+                    update_post(filename, title)
+                    del lines[post_line[0] - 1]
+                    del data_content[post_line[0] - 1]
+                    for index, dl in enumerate(data_content):
+                        data_content[index] = dl.replace(
+                            dl[:dl.find('.')], str(index + 1), 1)
+
+                    for index, ll in enumerate(lines):
+                        ll[0] = index + 1
+                        lines[index] = ll
+
+                    data.truncate(0)
+                    data.writelines(data_content)
+
+                    if len(lines) > 0 and input(BColors.BOLD + '\nDo you want to update another post? (Y/n) ' + BColors.ENDC).strip().lower() == 'y':
+                        print()
+                        continue
+                    else:
+                        break
+
+elif sys.argv[1].lower() == 'list':
+    # List the posts with count/... and ask what would you like to do.
+    pass
+elif sys.argv[1].lower() == 'show':
+    # Show information of the post with filename
+    pass
+else:
+    print(BColors.FAIL + 'Invalid command!' +  BColors.ENDC)

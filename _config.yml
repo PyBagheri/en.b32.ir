@@ -8,7 +8,8 @@
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 #--------------------------
 
-title: M. Bagheri                          # the main title
+title: MohammadHossein Bagheri                         # the main title
+website_title: M. Bagheri
 
 tagline: Writing is relaxing ...  # it will display as the sub-title
 
