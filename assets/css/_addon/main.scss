@@ -1601,3 +1601,7 @@ ol.persian {
 
 	.no-border-radius { &, * { border-radius: 0 !important; } }
 }
+
+body {
+	overflow-x: hidden;
+}

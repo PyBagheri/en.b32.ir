@@ -9,9 +9,16 @@ import datetime
 import pytz
 import shutil
 import re
+import glob
+import uuid
+import hashlib
 
 # Install with: pip install jdatetime
 import jdatetime
+
+help_text = """
+
+""".strip()
 
 
 def enToFaNumbers(string):
@@ -51,6 +58,9 @@ def getIranianWeekdayName(iso_weekday_number):
             'شنبه',
             'یکشنبه'][iso_weekday_number - 1]
 
+def get_unique_hash():
+    return hashlib.md5(str(uuid.uuid4()).encode('utf-8')).hexdigest()
+
 
 class BColors:
     HEADER = '\033[95m'
@@ -66,7 +76,33 @@ class BColors:
 # Constant variables
 base_dir = os.path.abspath(os.path.join(
     os.path.dirname(os.path.realpath(__file__)), os.pardir))
-website_url = 'https://b32.ir/en/'
+website_url = 'https://en.b32.ir/'
+
+
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+
+def add_non_existing_fields(content):
+    # Check if jdate fields exist
+    if not re.findall("\njdate:.*?\n", content):
+        content = re.sub("date: (.*?)??\n", 'date: ' + r'\g<1>' +
+                                "\njdate:\n" +
+                                "  year:\n" +
+                                "    fa: {jdate_year_fa}\n" +
+                                "    en: {jdate_year_en}\n" +
+                                "  month:\n" +
+                                "    number: {jdate_month_number}\n" +
+                                "    name: {jdate_month_name}\n" +
+                                "  day: {jdate_day}\n" +
+                                "  weekdayname: {jdate_weekdayname}\n" +
+                                "  time: {jdate_time}\n", content, 1)
+    
+    if not re.findall("\nhashid:.*?\n", content):
+        content = rreplace(content, '---', 'hashid: {0}\n---'.format(get_unique_hash()), 1)
+    
+    return content
 
 
 def update_post(filename, title='', filename_update=False):
@@ -107,19 +143,7 @@ def update_post(filename, title='', filename_update=False):
                       "(  weekdayname: )(.*?)??\n": getIranianWeekdayName(post_datetime.isoweekday()),
                       "(  time: )(.*?)??\n": post_datetime.strftime('%H:%M:%S %z')}
 
-        # Check if jdate fields exist
-        if not re.findall("\njdate:.*?\n", post_content):
-            post_content = re.sub("date: (.*?)??\n", 'date: ' + r'\g<1>' +
-                                  "\njdate:\n" +
-                                  "  year:\n" +
-                                  "    fa: {jdate_year_fa}\n" +
-                                  "    en: {jdate_year_en}\n" +
-                                  "  month:\n" +
-                                  "    number: {jdate_month_number}\n" +
-                                  "    name: {jdate_month_name}\n" +
-                                  "  day: {jdate_day}\n" +
-                                  "  weekdayname: {jdate_weekdayname}\n" +
-                                  "  time: {jdate_time}\n", post_content, 1)
+        post_content = add_non_existing_fields(post_content)
 
         for regex, value in to_replace.items():
             post_content = re.sub(
@@ -133,6 +157,9 @@ def update_post(filename, title='', filename_update=False):
     print(BColors.BOLD + BColors.OKBLUE + 'The post updated successfully!\n\nYour post:\nTitle: {0}\nFilename: {1}\nDate & Time: {2}'.format(
         title, filename, post_datetime.strftime('%Y-%m-%d %H:%M:%S %z')) + BColors.ENDC)
 
+# Check if a command has given.
+if len(sys.argv) < 2:
+    print(BColors.FAIL + 'Invalid command!' +  BColors.ENDC)
 
 if sys.argv[1].lower() == 'new':
     # Title & Filename'.blogger.data'
@@ -169,10 +196,12 @@ if sys.argv[1].lower() == 'new':
                 break
 
             # Check if file exists.
-            if os.path.isfile(post_file_path):
+            # We could use ':=' in python3.8, but went this way for compatibility.
+            check = glob.glob(os.path.join(base_dir, '_posts/????-??-??-{0}.md'.format(filename)))
+            if check:
                 # Show an error.
                 print(
-                    BColors.FAIL + 'Sorry, there is a file with that name in your posts directory: ' + full_filename)
+                    BColors.FAIL + 'Sorry, there is already a file with that name in your posts directory: ' + check[0].split('/')[-1])
                 print(
                     'Please use another filename and ensure you are not repeating something.\n' + BColors.ENDC)
 
@@ -300,7 +329,7 @@ if sys.argv[1].lower() == 'new':
            "\nCongratulations! Your post file created as _posts/{0}.\nAfter you have finished writing the post, run this command: ./blogger update" + BColors.ENDC).format(full_filename))
 
 elif sys.argv[1].lower() == 'update':
-    if sys.argv[2]:
+    if len(sys.argv) > 2:  # Check if sys.argv[2] exists.
         if sys.argv[2].strip().lower() == '-f':
             if not os.path.isfile(os.path.join(base_dir, '_posts/' + sys.argv[3])):
                 print(BColors.FAIL + BColors.BOLD +
@@ -412,5 +441,7 @@ elif sys.argv[1].lower() == 'list':
 elif sys.argv[1].lower() == 'show':
     # Show information of the post with filename
     pass
+elif sys.argv[1].lower() in ('h', 'help', '-h', '--help'):
+    print(help_text)
 else:
     print(BColors.FAIL + 'Invalid command!' +  BColors.ENDC)

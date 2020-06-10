@@ -26,7 +26,7 @@ layout: default
             <i class="unloaded">{{ page.date | date_to_xmlschema }}</i>
           </span>
           by
-          <a href="/tabs/about" class="author">
+          <a href="{{ site.url }}{{ site.baseurl }}/tabs/about" class="author">
           {% if page.author %}
             {{ page.author }}
           {% else%}
@@ -43,7 +43,7 @@ layout: default
             <i class="unloaded">{{ page.date | date_to_xmlschema }}</i>
           </span>،
           توسط
-          <a href="/tabs/about" class="author">
+          <a href="{{ site.url }}{{ site.baseurl }}/tabs/about" class="author">
           {% if page.author %}
             {{ page.author }}
           {% else%}
@@ -102,27 +102,15 @@ layout: default
 
         {{ content }}
 	
-	<!--
-	<div id="hyvor-talk-view"></div>
-        <script type="text/javascript">
-            var HYVOR_TALK_WEBSITE = 698;
-            var HYVOR_TALK_CONFIG = {
-                url: '{{ page.url | absolute_url }}',
-                id: '{{page.id}}'
-            };
-        </script>
-        <script async type="text/javascript" src="//talk.hyvor.com/web-api/embed"></script>
-	-->
-
-	<!-- Comments -->
-{% if site.data.comments[page.slug] %}
+<!-- Comments -->
+{% if site.data.comments[page.hashid] %}
     <h3>
-    {% if site.data.comments[page.slug].size > 1 %}
-      {{ site.data.comments[page.slug] | size }}
+    {% if site.data.comments[page.hashid].size > 1 %}
+      {{ site.data.comments[page.hashid] | size }}
     {% endif %}
     Comments:
     </h3>
-  {% assign comments = site.data.comments[page.slug] | sort %}
+  {% assign comments = site.data.comments[page.hashid] | sort %}
     {% for comment in comments %}
       <label>
         {% if comment[1].url %}
@@ -137,10 +125,13 @@ layout: default
       <p>{{ comment[1].message | markdownify }}</p>
     {% endfor %}
 {% endif %}
+
 <!-- Comments Form -->
   <form method="POST" action="{{ site.staticman_url }}">
-    <input name="options[redirect]" type="hidden" value="https://example.com">
-    <input name="options[slug]" type="hidden" value="{{ page.slug }}">
+    <input name="options[redirect]" type="hidden" value="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
+    <input name="options[title]" type="hidden" value="{{ page.title }}">
+    <input name="options[url]" type="hidden" value="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
+    <input name="options[hashid]" type="hidden" value="{{ page.hashid }}">
       <label>Name</label>
       <input name="fields[name]" type="text">
       <label>E-mail (optional)</label>

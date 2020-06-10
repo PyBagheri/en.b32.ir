@@ -49,7 +49,7 @@ google_site_verification: google_meta_tag_verification # change to your verifica
 #--------------------------
 
 # if your site type is Project Pages site, change below value to '/projectname'
-baseurl: ''
+baseurl: '/en'
 
 # Change to your timezone › http://www.timezoneconverter.com/cgi-bin/findzone/findzone
 timezone: Asia/Tehran
@@ -190,6 +190,7 @@ exclude:
   - tools
   - docs
   - README.md
+  - notes.txt
 
 sitemap_exclude:  # Sitemap will exclude the following items.
   fuzzy:
@@ -205,5 +206,7 @@ sitemap_exclude:  # Sitemap will exclude the following items.
     - sitemap.xml
     - robots.txt
     - redirects.json
+    - notes.txt
 
-staticman_url: https://dev.staticman.net/v3/entry/github/PyBagheri/b32.ir/master
+staticman_url: https://dev.staticman.net/v3/entry/github/PyBagheri/b32.ir/master/comments/
+encoding: "utf-8"
