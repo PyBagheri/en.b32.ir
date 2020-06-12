@@ -1572,7 +1572,7 @@ ol.persian {
 }
 
 .center-margin { margin-left: auto; margin-right: auto }
-.center-transform { position: relative; right: 50%; transform: translateX(50%); }
+.center-transform { position: relative; left: 50%; transform: translateX(-50%); }
 .center-transform-right { position: relative; right: 50%; transform: translateX(50%); }
 .center-transform-left { position: relative; left: 50%; transform: translateX(-50%); }
  
@@ -1602,6 +1602,123 @@ ol.persian {
 	.no-border-radius { &, * { border-radius: 0 !important; } }
 }
 
-body {
+html {
 	overflow-x: hidden;
+}
+
+#panel-wrapper {
+	overflow-x: initial;
+}
+
+#comments-container {
+	background-color: #f7f7f7;
+	padding: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	border-radius: .3rem;
+	margin-top: 2rem;
+	
+	> #comments-title {
+		margin-top: 0;
+		margin-bottom: 1rem;
+		font-size: 1.8rem;
+		font-family: 'Lato', 'Vazir', 'Microsoft Yahei', sans-serif;
+	}
+
+	> #comments-list-title {
+		margin-top: 2rem;
+		padding-top: 0;
+		font-size: 1.25rem;
+		margin-bottom: 1rem;
+		font-family: 'Lato', 'Vazir', 'Microsoft Yahei', sans-serif;
+	}
+
+	.comment-box {
+		> p {
+			margin-bottom: 0;
+		}
+	}
+
+	> hr {
+		width: 100%;
+		margin: 1.5rem 0;
+	}
+
+	> form {
+		display: flex;
+		flex-direction: column;
+		
+		> *:not(:last-child) {
+			margin-bottom: .5rem;
+		}
+
+		> input {
+			max-width: 18rem;
+		}
+
+		> input, textarea {
+			padding: .1rem .5rem;
+			/*border: #dddddd solid 1px;*/
+			border: none;
+			box-shadow: 0 .1rem .15rem #dddddd;
+			border-radius: .2rem;
+			font-size: 1.1rem;
+		}
+
+		.form-last-row {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			margin-top: .5rem;
+			
+			small {
+				margin-left: 2em;
+				color: #aaaaaa;
+			}
+		}
+
+		.submit-button {
+			background-color: #1E88E5;
+			color: white;
+			border-radius: .2rem !important;
+			border: none;
+			transition: .2rem;
+			align-self: flex-start;
+			padding: .1rem .5rem;
+			font-size: 1.1rem;
+			box-shadow: 0 .1rem .2rem lightgray;
+			cursor: pointer;
+			z-index: 1;
+			
+			&:hover {
+				background-color: darken(#1E88E5, 5%);
+			}
+		}
+	}
+}
+
+html[mode="dark"] {
+        #comments-container {
+                background-color: #272822 !important;
+
+                textarea, input {
+                        background-color: lighten(#272822, 10%);
+                        color: white;
+                        box-shadow: 0 .1rem .1rem #222222;
+                }
+
+                .submit-button {
+                        background-color: darken(#1E88E5, 10%);
+                        box-shadow: 0 .1rem .1rem #222222;
+
+                        &:hover {
+                                background-color: darken(#1E88E5, 15%);
+                        }
+                }
+
+                hr {
+                        border-color: #424242;
+                }
+        }
 }

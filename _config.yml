@@ -18,11 +18,11 @@ description: >-                        # used by seo meta and the atom feed
   write my thoughts.
 
 # Replace with the website url, e.g. 'https://username.github.io'
-url: 'https://b32.ir'
+url: 'https://en.b32.ir'
 
 author: MohammadHossein Bagheri                  # change to your full name
 
-avatar: /assets/img/profile.jpg0   # support internet resources
+avatar: /assets/img/profile.jpg   # support internet resources
 
 github:
   username: PyBagheri             # change to your github username
@@ -31,13 +31,14 @@ twitter:
   username: PyBagheri            # change to your twitter username
 
 telegram:
-  username: Mubkh
+  username: b32ir
 
 social:
   name: MohammadHossein Bagheri KheirAbadi                  # it will shows as the copyright owner in Footer
   email: py.persian@gmail.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link
+    - https://t.me/b32ir
     - https://twitter.com/PyBagheri      # change to your twitter homepage
     - https://github.com/PyBagheri     # change to your github homepage
     # Uncomment below to add more social links
@@ -49,7 +50,7 @@ google_site_verification: google_meta_tag_verification # change to your verifica
 #--------------------------
 
 # if your site type is Project Pages site, change below value to '/projectname'
-baseurl: '/en'
+baseurl: ''
 
 # Change to your timezone › http://www.timezoneconverter.com/cgi-bin/findzone/findzone
 timezone: Asia/Tehran
@@ -207,6 +208,8 @@ sitemap_exclude:  # Sitemap will exclude the following items.
     - robots.txt
     - redirects.json
     - notes.txt
+    - sw.js
+    - app.js
 
-staticman_url: https://dev.staticman.net/v3/entry/github/PyBagheri/b32.ir/master/comments/
+staticman_url: https://dev.staticman.net/v3/entry/github/PyBagheri/en.b32.ir/master/comments/
 encoding: "utf-8"

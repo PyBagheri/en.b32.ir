@@ -1,10 +1,20 @@
 ---
 title: Text and Typography
-lang: fa
 author: Cotes Chung
 date: 2019-08-08 11:33:00 +0800
+jdate:
+  year:
+    fa: ۱۳۹۸
+    en: 1398
+  month:
+    number: 5
+    name: مرداد
+  day: 17
+  weekdayname: پنجشنبه
+  time: 11:33:00 +0800
 categories: [Blogging, Demo]
 tags: [typography]
+hashid: 08ba1951603c2c71ae5c53a995918db3
 ---
 
 This Jekyll template totally compatible with Markdown syntax. Now, let's take a look for the text and typography in this theme.

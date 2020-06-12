@@ -102,47 +102,6 @@ layout: default
 
         {{ content }}
 	
-<!-- Comments -->
-{% if site.data.comments[page.hashid] %}
-    <h3>
-    {% if site.data.comments[page.hashid].size > 1 %}
-      {{ site.data.comments[page.hashid] | size }}
-    {% endif %}
-    Comments:
-    </h3>
-  {% assign comments = site.data.comments[page.hashid] | sort %}
-    {% for comment in comments %}
-      <label>
-        {% if comment[1].url %}
-          <a href="{{ comment[1].url }}">
-        {% endif %}
-        <strong>{{ comment[1].name }}</strong>
-        {% if comment[1].url %}
-          </a>
-        {% endif %}
-      </label>
-      <em>{{ comment[1].date | date: "%B %d, %Y" }}</em>
-      <p>{{ comment[1].message | markdownify }}</p>
-    {% endfor %}
-{% endif %}
-
-<!-- Comments Form -->
-  <form method="POST" action="{{ site.staticman_url }}">
-    <input name="options[redirect]" type="hidden" value="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
-    <input name="options[title]" type="hidden" value="{{ page.title }}">
-    <input name="options[url]" type="hidden" value="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
-    <input name="options[hashid]" type="hidden" value="{{ page.hashid }}">
-      <label>Name</label>
-      <input name="fields[name]" type="text">
-      <label>E-mail (optional)</label>
-      <input name="fields[email]" type="email">
-      <label>Website (optional)</label>
-      <input name="fields[url]" type="url">
-      <label>Message</label>
-      <textarea style="width:100%" name="fields[message]" rows="12"></textarea>
-      <small>Comments will appear after moderation.</small>
-      <button type="submit">Submit</button>
-  </form>
       </div>
 
       <div class="post-tail-wrapper text-muted">
@@ -186,6 +145,66 @@ layout: default
         </div><!-- .post-tail-bottom -->
 
       </div><!-- div.post-tail -->
+
+{% unless page.nocomments %}
+    {% assign nc = page.nocomments | strip | lower %}
+    {% unless nc == 'true' %}
+<!-- Comments -->
+<div id="comments-container">
+  <div id="comments-title">Your opinion</div>
+
+  <script>
+	function checkURL (abc) {
+	  var string = abc.value;
+	  if (string && !~string.indexOf("http")) {
+	    string = "http://" + string;
+	  }
+	  abc.value = string;
+	  return abc
+	}
+  </script>
+
+  <!-- Comments Form -->
+  <form method="POST" action="{{ site.staticman_url }}">
+    <input name="options[redirect]" type="hidden" value="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
+    <input name="options[title]" type="hidden" value="{{ page.title }}">
+    <input name="options[hashid]" type="hidden" value="{{ page.hashid }}">
+      <input placeholder="Name" name="fields[name]" type="text" required>
+      <input placeholder="Email (Optional)" name="fields[email]" type="email">
+      <input placeholder="Website (Optional)" name="fields[url]" type="url" onblur="checkURL(this)">
+      <textarea placeholder="Your message ..." style="width:100%" name="fields[message]" rows="12" required></textarea>
+      <div class="form-last-row"><button class="submit-button">Submit</button><small>Comments will appear after moderation.</small></div>
+  </form>
+
+{% if site.data.comments[page.hashid] %}
+    <div id="comments-list-title">
+    {% if site.data.comments[page.hashid].size > 1 %}
+      {{ site.data.comments[page.hashid] | size }}
+    {% endif %}
+    Comments:
+    </div>
+  {% assign comments = site.data.comments[page.hashid] | sort %}
+    {% for comment in comments %}
+      <div class="comment-box">
+        <label>
+          {% if comment[1].url != '' %}
+            <a rel="nofollow" href="{{ comment[1].url }}">
+          {% endif %}
+          <strong>{{ comment[1].name }}</strong>
+          {% if comment[1].url != '' %}
+            </a>
+          {% endif %}
+        </label>
+        <em>{{ comment[1].date | date: "%B %d, %Y" }}</em>
+        <p>{{ comment[1].message | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+      </div>
+      {% if forloop.last != true %}<hr>{% endif %}
+    {% endfor %}
+{% endif %}
+</div>
+    {% endunless %}
+{% endunless %}
+
 
     </div> <!-- .post -->
 

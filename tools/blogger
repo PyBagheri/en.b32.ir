@@ -283,6 +283,11 @@ if sys.argv[1].lower() == 'new':
 
     tags = new_tags
 
+    # Check if the comments should be disabled or not.
+    comments_enabled = True
+    if input(BColors.BOLD + "\nDo you want to DISABLE comments? (type \"DISABLE\") " + BColors.ENDC).strip().lower() == 'disable':
+        comments_enabled = False
+
     # Create the file and write in it.
     with open(post_file_path, 'w') as file:
         # Both "date" and "jdate" options will update after writing the post and running ./blogger update [filename]
@@ -309,9 +314,12 @@ if sys.argv[1].lower() == 'new':
         if has_image:
             # Insert image option
             header.insert(
-                3, "image: {0}/assets/img/posts/{1}".format(website_url, image_filename))
+                3, "image: {0}/assets/img/posts/{1}".format(website_url.rstrip('/'), image_filename))
 
         file.write('\n'.join(header))
+
+        if not comments_enabled:
+            header.insert(-1, 'nocomments: true')
 
     # Where the script stores the files that are not updated yet.
     with open(os.path.join(base_dir, 'tools/.blogger.data'), 'a+') as data:

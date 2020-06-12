@@ -2,9 +2,20 @@
 title: Customize the Favicon
 author: Cotes Chung
 date: 2019-08-11 00:34:00 +0800
+jdate:
+  year:
+    fa: ۱۳۹۸
+    en: 1398
+  month:
+    number: 5
+    name: مرداد
+  day: 20
+  weekdayname: یکشنبه
+  time: 00:34:00 +0800
 categories: [Blogging, Tutorial]
 tags: [favicon]
 toc: false
+hashid: a9de1cc7511d1a692082509042352077
 ---
 
 In [**Chirpy**](https://github.com/cotes2020/jekyll-theme-chirpy/), the image files of [Favicons](https://www.favicon-generator.org/about/) are placed in `assets/img/favicons/`. You may need to replace them with your own. So let's see how to customize these Favicons.

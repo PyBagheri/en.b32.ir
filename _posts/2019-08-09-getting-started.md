@@ -1,11 +1,21 @@
 ---
 title: Getting Started
-lang: fa
 image: http://127.0.0.1:4000/assets/img/posts/sample1.jpg
 author: Cotes Chung
 date: 2019-08-09 20:55:00 +0800
+jdate:
+  year:
+    fa: ۱۳۹۸
+    en: 1398
+  month:
+    number: 5
+    name: مرداد
+  day: 18
+  weekdayname: جمعه
+  time: 20:55:00 +0800
 categories: [Blogging, Tutorial]
 tags: [getting started]
+hashid: feae99229ee918af2d6d0a0adfb1a37a
 ---
 
 ## Prerequisites
